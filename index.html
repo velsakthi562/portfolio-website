@@ -141,7 +141,7 @@
   .lift-primary, .lift-secondary{transform-origin:center bottom;}
   .thumb-mast{ position:absolute; inset:0; width:100%; height:100%; opacity:0.85; }
 
-  .hero-model{ position:absolute; right:2%; top:52%; transform:translateY(-50%); width:min(38vw, 460px); height:460px; pointer-events:auto; cursor:grab; }
+  .hero-model{ position:absolute; right:9%; top:52%; transform:translateY(-50%); width:min(34vw, 420px); height:420px; pointer-events:auto; cursor:grab; }
   .hero-model.dragging{cursor:grabbing;}
   .hero-model::before{
     content:''; position:absolute; inset:-10%; z-index:-1; border-radius:50%;
@@ -760,7 +760,7 @@
         const w = container.clientWidth, h = container.clientHeight;
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(35, w/h, 0.1, 50);
-        camera.position.set(0, 0.15, 3.4);
+        camera.position.set(0, 0.1, 4.1);
 
         const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -825,7 +825,7 @@
           box.getSize(size);
           const center = new THREE.Vector3();
           box.getCenter(center);
-          const scale = 2.1 / Math.max(size.x, size.y, size.z);
+          const scale = 1.75 / Math.max(size.x, size.y, size.z);
           model.scale.setScalar(scale);
           model.position.set(-center.x*scale, -center.y*scale, -center.z*scale);
 
