@@ -304,6 +304,14 @@
   .orb-caption .accent{ color:var(--amber); }
   @media (max-width:800px){ .stack-orb{align-self:center;} .orb-caption{white-space:normal;} }
 </style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 </head>
 <body>
 
@@ -738,9 +746,9 @@
       if(reduceMotion || !container || !window.WebGLRenderingContext) return;
 
       try {
-        const THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js');
-        const { GLTFLoader } = await import('https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js');
-        const { DRACOLoader } = await import('https://unpkg.com/three@0.160.0/examples/jsm/loaders/DRACOLoader.js');
+        const THREE = await import('three');
+        const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+        const { DRACOLoader } = await import('three/addons/loaders/DRACOLoader.js');
 
         const w = container.clientWidth, h = container.clientHeight;
         const scene = new THREE.Scene();
