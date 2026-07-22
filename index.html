@@ -1008,7 +1008,7 @@
           const scale = 2.30 / Math.max(size.x, size.y, size.z);
           model.scale.setScalar(scale);
           model.position.set(-center.x*scale, -center.y*scale, -center.z*scale);
-          model.rotation.y = Math.PI / 2;
+          model.rotation.y = 0;
           model.traverse((child) => {
             if(child.isMesh){ child.castShadow = true; child.receiveShadow = false; }
           });
@@ -1020,8 +1020,8 @@
             const action = mixer.clipAction(gltf.animations[0]);
             action.setLoop(THREE.LoopOnce);
             action.clampWhenFinished = true;
-            action.time = action.getClip().duration;
-            action.timeScale = -1;
+            action.time = 0;
+            action.timeScale = 1;
             mixer.addEventListener('finished', () => {
               introDone = true;
               velX = 0.001;
