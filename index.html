@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sakthivel G — Senior Unity Developer</title>
+<meta name="description" content="Sakthivel G — Senior Unity Developer building training simulations, product visualization, WebXR, AR and interactive 3D experiences.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #080b12;
+    --panel: #0d121b;
+    --panel-2: #121a26;
+    --line: #1c2430;
+    --line-soft: #141b25;
+    --text: #ece9e2;
+    --text-muted: #8b9096;
+    --amber: #c7ccd4;
+    --amber-dim: #4a5568;
+    --cyan: #6f9dc7;
+    --radius: 3px;
+    --maxw: 1180px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  h1,h2,h3{font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 32px;}
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+  ::selection{background:var(--amber); color:#0a0c0e;}
+  :focus-visible{outline:2px solid var(--amber); outline-offset:3px;}
+
+  /* background grid texture */
+  .grid-bg{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:0.32;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 90%);
+    transition:opacity 0.6s ease;
+  }
+  #bg3d{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    opacity:0; transition:opacity 1.2s ease;
+  }
+  #bg3d.loaded{opacity:1;}
+  #bg3d canvas{display:block; width:100%; height:100%;}
+
+  /* NAV */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    background:rgba(10,12,14,0.85);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    max-width:var(--maxw); margin:0 auto; padding:18px 32px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{font-family:'Space Grotesk'; font-weight:700; font-size:16px; letter-spacing:0.02em;}
+  .logo span{color:var(--amber);}
+  .nav-links{display:flex; gap:36px; align-items:center;}
+  .nav-links a{
+    position:relative; font-size:13px; font-family:'JetBrains Mono'; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:0.08em;
+    transition:color 0.2s; padding-bottom:3px;
+  }
+  .nav-links a::after{
+    content:''; position:absolute; left:0; bottom:0; width:0; height:1px;
+    background:var(--amber); transition:width 0.25s ease;
+  }
+  .nav-links a:hover{color:var(--text);}
+  .nav-links a:hover::after{width:100%;}
+  .nav-cta{
+    font-family:'JetBrains Mono'; font-size:12px; text-transform:uppercase; letter-spacing:0.08em;
+    border:1px solid var(--amber-dim); color:var(--amber);
+    padding:9px 18px; border-radius:var(--radius);
+    transition:all 0.2s;
+  }
+  .nav-cta:hover{background:var(--amber); color:#0a0c0e; border-color:var(--amber);}
+  .nav-toggle{display:none;}
+
+  /* HERO */
+  .hero{
+    position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:center;
+    padding-top:80px; z-index:1;
+  }
+  .hero-inner{max-width:var(--maxw); margin:0 auto; padding:0 32px; width:100%; position:relative;}
+  .eyebrow{
+    font-family:'JetBrains Mono'; font-size:12px; color:var(--amber);
+    text-transform:uppercase; letter-spacing:0.14em; margin-bottom:18px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:''; width:22px; height:1px; background:var(--amber);}
+  .hero h1{
+    font-size:clamp(48px, 8vw, 96px); font-weight:700; line-height:0.98;
+    letter-spacing:-0.02em; margin-bottom:8px;
+  }
+  .hero .role{
+    font-size:clamp(20px, 2.6vw, 28px); color:var(--text-muted); font-weight:500;
+    margin-bottom:28px; font-family:'Space Grotesk';
+  }
+  .hero .role em{color:var(--amber); font-style:normal;}
+  .hero p.lead{
+    max-width:560px; font-size:16px; color:#a3aab3; margin-bottom:40px;
+  }
+  .hero-actions{display:flex; gap:16px; flex-wrap:wrap;}
+  .btn{
+    font-family:'JetBrains Mono'; font-size:13px; text-transform:uppercase; letter-spacing:0.08em;
+    padding:15px 28px; border-radius:var(--radius); transition:all 0.2s;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{background:var(--amber); color:#0a0c0e; font-weight:500; transition:transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;}
+  .btn-primary:hover{background:#e2e6eb; transform:translateY(-3px); box-shadow:0 10px 26px -8px rgba(207,212,220,0.35);}
+  .btn-ghost{border:1px solid var(--line); color:var(--text); transition:transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;}
+  .btn-ghost:hover{border-color:var(--text-muted); transform:translateY(-3px); box-shadow:0 10px 26px -10px rgba(255,255,255,0.12);}
+
+  /* mast schematic - signature graphic */
+  .mast-schematic{
+    position:absolute; right:0; top:50%; transform:translateY(-50%);
+    width:min(42vw, 480px); height:560px; opacity:0.9;
+    pointer-events:none;
+  }
+  @media (max-width:1000px){ .mast-schematic{display:none;} }
+  .mast-schematic svg{width:100%; height:100%;}
+  .mast-line{stroke:var(--line); stroke-width:1.5; fill:none;}
+  .mast-accent{stroke:var(--amber); stroke-width:1.5; fill:none;}
+  .mast-fill{fill:var(--panel-2); stroke:var(--line); stroke-width:1.5;}
+  .mast-label{font-family:'JetBrains Mono'; font-size:9px; fill:var(--text-muted); letter-spacing:0.05em;}
+  .lift-primary, .lift-secondary{transform-origin:center bottom;}
+  .thumb-mast{ position:absolute; inset:0; width:100%; height:100%; opacity:0.85; }
+
+  .hero-model{ position:absolute; right:15%; top:168px; width:min(41vw, 515px); height:515px; pointer-events:auto; cursor:grab; }
+  .hero-model.dragging{cursor:grabbing;}
+  .hero-model::before{
+    content:''; position:absolute; inset:-10%; z-index:-1; border-radius:50%;
+    background:radial-gradient(circle, rgba(207,212,220,0.16) 0%, rgba(111,157,199,0.08) 35%, transparent 70%);
+    pointer-events:none;
+  }
+  @media (max-width:1000px){ .hero-model{display:none;} }
+  .hero-model canvas{display:block;}
+
+  .scroll-hint{
+    position:absolute; bottom:36px; left:32px;
+    display:flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono'; font-size:11px; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:0.1em;
+  }
+  .scroll-hint .bar{width:1px; height:28px; background:linear-gradient(var(--amber), transparent); animation:scrollpulse 2s ease-in-out infinite;}
+  @keyframes scrollpulse{0%,100%{opacity:0.3;} 50%{opacity:1;}}
+
+  section{position:relative; z-index:1; padding:120px 0;}
+  .section-head{margin-bottom:64px; max-width:640px;}
+  .section-head h2{font-size:clamp(28px, 4vw, 42px); font-weight:600; line-height:1.15;}
+
+  /* ABOUT */
+  #about{border-top:1px solid var(--line);}
+  .about-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:64px;}
+  @media (max-width:900px){ .about-grid{grid-template-columns:1fr;} }
+  .about-grid p{color:var(--text-muted); margin-bottom:18px; font-size:15.5px; max-width:520px;}
+  .stat-list{display:flex; flex-direction:column; gap:0; border-top:1px solid var(--line);}
+  .stat-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:20px 0; border-bottom:1px solid var(--line);
+  }
+  .stat-row .num{font-family:'Space Grotesk'; font-size:32px; font-weight:600; color:var(--amber);}
+  .stat-row .label{font-family:'JetBrains Mono'; font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; text-align:right; max-width:200px;}
+
+  /* PROJECTS */
+  #work{background:var(--panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding-bottom:100px;}
+
+  .project-grid.work-page{ display:none; }
+  .project-grid.work-page.active{ display:grid; }
+  .work-dots{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:36px; }
+  .carousel-dot{ width:26px; height:3px; border-radius:2px; background:var(--line); border:none; cursor:pointer; transition:all 0.3s ease; padding:0; }
+  .carousel-dot.active{ width:40px; background:var(--amber); }
+
+  .project-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:22px;
+    max-width:var(--maxw); margin:0 auto; padding:0 32px;
+  }
+  @media (max-width:1000px){ .project-grid{grid-template-columns:repeat(2, 1fr);} }
+  @media (max-width:640px){ .project-grid{grid-template-columns:1fr; padding:0 20px;} }
+  .project-card{
+    background:var(--panel-2); padding:22px 24px; border:1px solid var(--line); border-radius:10px;
+    transition:transform 0.25s ease, border-color 0.25s ease; display:flex; flex-direction:column; min-height:190px;
+  }
+  .project-card:hover{ transform:translateY(-4px); border-color:var(--amber-dim); }
+  .project-tags{
+    font-family:'JetBrains Mono'; font-size:10px; color:var(--cyan);
+    text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;
+  }
+  .project-card h3{font-size:16.5px; font-weight:600; margin-bottom:8px; line-height:1.3;}
+  .project-card p{color:var(--text-muted); font-size:14px; line-height:1.55; flex:1;}
+  .project-footer{ margin-top:16px; display:flex; align-items:center; justify-content:space-between; }
+  .project-status{ font-family:'JetBrains Mono'; font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+  .target-btn{
+    width:30px; height:30px; border-radius:50%; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition:all 0.25s;
+  }
+  .target-btn svg{ width:13px; height:13px; stroke:var(--amber); fill:none; }
+  .project-card:hover .target-btn{ border-color:var(--amber); background:var(--amber); }
+  .project-card:hover .target-btn svg{ stroke:#080b12; }
+
+  .project-thumb{
+    position:relative; aspect-ratio:16/9; width:calc(100% + 48px); margin:-22px -24px 16px;
+    overflow:hidden; background:linear-gradient(135deg, var(--panel), var(--line-soft));
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .project-thumb::before{
+    content:''; position:absolute; inset:0;
+    background-image:linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:20px 20px; opacity:0.6;
+  }
+  .play-btn{
+    position:relative; z-index:1; width:40px; height:40px; border-radius:50%;
+    border:1px solid var(--amber-dim); background:rgba(8,11,18,0.6);
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.25s;
+  }
+  .play-btn svg{width:13px; height:13px; fill:var(--amber); margin-left:2px;}
+  .project-thumb:hover .play-btn{background:var(--amber); border-color:var(--amber); transform:scale(1.12);}
+  .project-thumb:hover .play-btn svg{fill:#080b12;}
+  .thumb-tag{
+    position:absolute; top:10px; right:10px; z-index:1;
+    font-family:'JetBrains Mono'; font-size:9px; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--text-muted); background:rgba(8,11,18,0.7); padding:3px 7px; border-radius:var(--radius);
+    border:1px solid var(--line);
+  }
+
+  /* SKILLS */
+  #stack{padding-bottom:120px;}
+  .skills-grid{display:grid; grid-template-columns:repeat(5, 1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+  @media (max-width:900px){ .skills-grid{grid-template-columns:repeat(3, 1fr);} }
+  @media (max-width:560px){ .skills-grid{grid-template-columns:repeat(2, 1fr);} }
+  .skill-tile{
+    background:var(--panel); padding:22px 18px; text-align:left;
+    display:flex; flex-direction:column; gap:16px; min-height:110px;
+    transition:background 0.2s;
+  }
+  .skill-tile:hover{background:var(--panel-2);}
+  .skill-tile .icon{ width:22px; height:22px; }
+  .skill-tile .icon svg{ width:100%; height:100%; stroke:var(--amber); fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  .skill-tile .name{font-family:'Space Grotesk'; font-weight:600; font-size:14px;}
+
+  /* CONTACT */
+  #contact{border-top:1px solid var(--line);}
+  .contact-inner{display:flex; flex-direction:column; align-items:flex-start;}
+  #contact h2{font-size:clamp(32px, 5vw, 56px); font-weight:600; max-width:760px; line-height:1.1; margin-bottom:28px;}
+  #contact .lead{color:var(--text-muted); max-width:520px; margin-bottom:48px; font-size:16px;}
+  .contact-links{display:flex; gap:16px; flex-wrap:wrap;}
+  .contact-icon{
+    width:58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--line); background:var(--panel-2); transition:all 0.25s; position:relative;
+  }
+  .contact-icon svg{ width:21px; height:21px; stroke:var(--text-muted); fill:none; transition:stroke 0.25s; }
+  .contact-icon:hover{ border-color:var(--amber); background:var(--amber); transform:translateY(-3px); }
+  .contact-icon:hover svg{ stroke:#080b12; }
+  .contact-icon .tip{
+    position:absolute; bottom:-24px; left:50%; transform:translateX(-50%);
+    font-family:'JetBrains Mono'; font-size:9px; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;
+  }
+
+  footer{
+    padding:32px; text-align:center; border-top:1px solid var(--line);
+    font-family:'JetBrains Mono'; font-size:11px; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:0.06em;
+  }
+
+  /* reveal on scroll */
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity 0.7s ease, transform 0.7s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* mobile nav */
+  @media (max-width:760px){
+    .nav-links{display:none;}
+  }
+
+  /* custom cursor */
+  @media (hover:hover) and (pointer:fine){
+    body{ cursor:none; }
+    a, button, .project-card, .contact-icon, .carousel-dot{ cursor:none; }
+  }
+  #cursor-particles{ position:fixed; inset:0; z-index:9998; pointer-events:none; }
+  .cursor-particle{ position:fixed; border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); will-change:opacity, transform, left, top; }
+  #cursor-ring{
+    position:fixed; top:0; left:0; width:32px; height:32px; border-radius:50%;
+    border:1px solid rgba(207,212,220,0.5); pointer-events:none; z-index:9999;
+    transform:translate(-50%,-50%);
+    transition:width 0.25s ease, height 0.25s ease, border-color 0.25s ease, opacity 0.3s ease;
+    opacity:0;
+  }
+  #cursor-orb{
+    position:fixed; top:0; left:0; width:12px; height:12px; border-radius:50%;
+    pointer-events:none; z-index:9999; transform:translate(-50%,-50%);
+    background:radial-gradient(circle at 35% 30%, rgba(238,241,245,0.95), rgba(111,157,199,0.65) 60%, rgba(111,157,199,0.1) 100%);
+    box-shadow:0 0 14px rgba(111,157,199,0.5);
+    transition:box-shadow 0.25s ease, opacity 0.3s ease;
+    opacity:0;
+  }
+  #cursor-orb.on, #cursor-ring.on{ opacity:1; }
+  @media (hover:none), (pointer:coarse){
+    #cursor-orb, #cursor-ring, #cursor-particles{ display:none; }
+    body{ cursor:auto; }
+  }
+
+  .thumb-note{
+    position:absolute; bottom:8px; left:8px; z-index:1;
+    font-family:'JetBrains Mono'; font-size:8.5px; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:0.05em; background:rgba(8,11,18,0.7);
+    padding:3px 7px; border-radius:var(--radius); border:1px dashed var(--line);
+  }
+
+  .stack-head-row{ display:flex; align-items:center; justify-content:space-between; gap:32px; margin-bottom:64px; }
+  @media (max-width:800px){ .stack-head-row{flex-direction:column; align-items:flex-start; gap:20px;} }
+  .stack-orb{ display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0; }
+  #orbCanvas{ width:170px; height:130px; }
+  #orbCanvas canvas{ display:block; }
+  .orb-caption{ font-family:'JetBrains Mono'; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.07em; text-align:center; white-space:nowrap; }
+  .orb-caption .accent{ color:var(--amber); }
+  @media (max-width:800px){ .stack-orb{align-self:center;} .orb-caption{white-space:normal;} }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div class="grid-bg" id="gridFallback"></div>
+<div id="bg3d"></div>
+<div id="cursor-particles"></div>
+<div id="cursor-ring"></div>
+<div id="cursor-orb"></div>
+
+<header>
+  <nav>
+    <a href="#top" class="logo">SAKTHIVEL <span>G</span></a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#work">Work</a>
+      <a href="#stack">Skills</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a href="#contact" class="nav-cta">Let's talk</a>
+  </nav>
+</header>
+
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <h1>Sakthivel G</h1>
+    <div class="eyebrow">5+ years · simulation & interactive 3D</div>
+    <div class="role">Senior <em>Unity</em> Developer</div>
+    <p class="lead">I build simulation, training, and interactive 3D systems — from hardware-linked simulators to WebXR and AR — where every mechanic has to feel physically right, not just look right.</p>
+    <div class="hero-actions">
+      <a href="#work" class="btn btn-primary">View Work</a>
+      <a href="#contact" class="btn btn-ghost">Contact</a>
+    </div>
+  </div>
+
+  <div class="hero-model" id="heroModel" aria-hidden="true"></div>
+
+  <div class="scroll-hint"><div class="bar"></div> Scroll</div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="reveal">
+        <div class="eyebrow">About</div>
+        <h2 style="margin-bottom:28px;">Systems that hold up under real interaction.</h2>
+        <p>I've spent the last five-plus years building real-time 3D systems for training, visualization, and play — work that has to survive contact with an actual user, not just a demo reel.</p>
+        <p>That's ranged from industrial training simulators wired up to real hardware over serial, to product visualization builds, WebXR experiences that run straight in the browser, AR overlays, cognitive training games, and custom shader work when a scene needs a specific look and can't afford the performance hit to get it.</p>
+        <p>I care about the mechanic being physically believable first — the polish comes after the thing actually behaves the way it should.</p>
+      </div>
+      <div class="reveal">
+        <div class="stat-list">
+          <div class="stat-row"><span class="num">05+</span><span class="label">Years building in Unity</span></div>
+          <div class="stat-row"><span class="num">06</span><span class="label">Domains — sim, viz, WebXR, AR, shaders, games</span></div>
+          <div class="stat-row"><span class="num">01</span><span class="label">Rule — make it feel physically right</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Selected work</div>
+      <h2>Recent projects</h2>
+    </div>
+
+    <div class="project-grid work-page active" id="workPage1">
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · ESP32 · Bluetooth · Quest 3</div>
+        <h3>EOT Crane Simulator</h3>
+        <p>Real-time swing-load physics with a live evaluation system. ESP32 hardware controller connects to Quest 3 over Bluetooth. Owned end-to-end, direct client ownership.</p>
+        <div class="project-footer"><span class="project-status">Solo project</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · ESP32 · Hardware-in-the-loop</div>
+        <h3>Forklift Operator Simulator</h3>
+        <p>A physics-driven forklift trainer built around a two-stage mast lift, synced live to ESP32 hardware over serial so the response matches the real machine.</p>
+        <div class="project-footer"><span class="project-status">Ongoing</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · VR Training · LMS</div>
+        <h3>Hand Injury & Manual Handling</h3>
+        <p>VR safety training covering hand-injury prevention and correct manual handling technique.</p>
+        <div class="project-footer"><span class="project-status">Delivered</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · VR Training · LMS</div>
+        <h3>Work at Height</h3>
+        <p>Fall-hazard and PPE training scenarios for working at height, built for LMS integration.</p>
+        <div class="project-footer"><span class="project-status">Delivered</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · VR Training · Solo project</div>
+        <h3>Heat Straightening</h3>
+        <p>VR training module on the heat straightening technique, built end-to-end on my own.</p>
+        <div class="project-footer"><span class="project-status">Delivered</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · VR Training</div>
+        <h3>Mechanical Pump VR</h3>
+        <p>Step-by-step pump assembly and disassembly training in VR.</p>
+        <div class="project-footer"><span class="project-status">Delivered</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+    </div>
+    <div class="project-grid work-page" id="workPage2">
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · API-integrated</div>
+        <h3>Bentoli Sales Tool</h3>
+        <p>API-integrated sales enablement tool, built end-to-end.</p>
+        <div class="project-footer"><span class="project-status">Delivered</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · Real-time 3D · Schneider Electric</div>
+        <h3>Product Visualization</h3>
+        <p>Interactive real-time product visualization delivered for Schneider Electric.</p>
+        <div class="project-footer"><span class="project-status">Delivered</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · VR · ITC Chennai</div>
+        <h3>VR Data Center Experience</h3>
+        <p>VR data-center product experience, exhibited live at ITC Chennai.</p>
+        <div class="project-footer"><span class="project-status">Exhibited</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">WebXR · Browser-based</div>
+        <h3>WebXR Experience</h3>
+        <p>Browser-native XR that runs the moment someone opens a link, no app install or headset setup required to demo.</p>
+        <div class="project-footer"><span class="project-status">Add details</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · AR Foundation</div>
+        <h3>AR Application</h3>
+        <p>Markerless AR for overlaying live instructions and diagnostics onto physical equipment.</p>
+        <div class="project-footer"><span class="project-status">Add details</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+      <div class="project-card reveal">
+        <a href="https://youtu.be/replace-with-your-video-link" target="_blank" rel="noopener" class="project-thumb" title="Replace with your YouTube or Drive link">
+          <span class="thumb-tag">Video</span>
+          <span class="thumb-note">Add YouTube / Drive link</span>
+          <span class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        </a>
+        <div class="project-tags">Unity · HLSL / Shader Graph</div>
+        <h3>Shader & Rendering Work</h3>
+        <p>Custom shaders for material realism and performance, PBR tuning through to stylized effects.</p>
+        <div class="project-footer"><span class="project-status">Add details</span><span class="target-btn"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="9 6 18 6 18 15"/></svg></span></div>
+      </div>
+    </div>
+
+    <div class="carousel-dots work-dots">
+      <button class="carousel-dot active" data-page="1" aria-label="Page 1"></button>
+      <button class="carousel-dot" data-page="2" aria-label="Page 2"></button>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <div class="stack-head-row reveal">
+      <div class="section-head" style="margin-bottom:0;">
+        <div class="eyebrow">Instrumentation</div>
+        <h2>Tools on the panel</h2>
+      </div>
+      <div class="stack-orb">
+        <div id="orbCanvas"></div>
+        <div class="orb-caption"><span class="accent">METAVERSE-READY</span> · VR / AR / WEBXR READY</div>
+      </div>
+    </div>
+    <div class="skills-grid reveal">
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="21"/></svg></span><span class="name">Unity</span></div>
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8l8 8M16 8l-8 8"/></svg></span><span class="name">Unreal Engine</span></div>
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l-2 3 2 3M18 9l2 3-2 3"/></svg></span><span class="name">C#</span></div>
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 15V9M14 9v6M18 9v6M11 12h6"/></svg></span><span class="name">C++</span></div>
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><circle cx="6" cy="18" r="2.4"/><path d="M6 8.4V15.6M8.4 18H15.6M18 8.4a5.6 5.6 0 0 1-9.6 3.9"/></svg></span><span class="name">Git</span></div>
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5z"/></svg></span><span class="name">Shader Programming</span></div>
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="15" y1="2" x2="15" y2="6"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="2" y1="15" x2="6" y2="15"/><line x1="18" y1="9" x2="22" y2="9"/><line x1="18" y1="15" x2="22" y2="15"/></svg></span><span class="name">Hardware / Serial (ESP32)</span></div>
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3v18M4 8l8-5 8 5M4 16l8 5 8-5"/></svg></span><span class="name">Maya</span></div>
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 16V8h3a2.5 2.5 0 0 1 0 5H8"/></svg></span><span class="name">Photoshop</span></div>
+      <div class="skill-tile"><span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M9 9l6 3-6 3z"/></svg></span><span class="name">Premiere Pro</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap contact-inner">
+    <div class="eyebrow reveal">Contact</div>
+    <h2 class="reveal">Let's build the next simulation.</h2>
+    <p class="lead reveal">Open to freelance Unity projects, simulation and training builds, and full-time roles. If you need something built that has to behave right in someone's hands, get in touch.</p>
+    <div class="contact-links reveal">
+      <a href="mailto:velsakthi562@gmail.com" class="contact-icon" aria-label="Email">
+        <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        <span class="tip">Email</span>
+      </a>
+      <a href="https://github.com/velsakthi562" target="_blank" rel="noopener" class="contact-icon" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4 1.5-4-2-6-2m12 3v-3.5c0-1 .1-1.4-.5-2 2-.2 4-1 4-4.5a3.5 3.5 0 0 0-1-2.5 3.2 3.2 0 0 0-.1-2.5s-.9-.3-2.9 1a10 10 0 0 0-5 0c-2-1.3-2.9-1-2.9-1a3.2 3.2 0 0 0-.1 2.5 3.5 3.5 0 0 0-1 2.5c0 3.5 2 4.3 4 4.5-.4.4-.6.9-.5 1.5V19"/></svg>
+        <span class="tip">GitHub</span>
+      </a>
+      <a href="https://linkedin.com/in/velsakthi562" target="_blank" rel="noopener" class="contact-icon" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="8" y1="11" x2="8" y2="16"/><circle cx="8" cy="8" r="0.4" fill="currentColor" stroke="none"/><path d="M12 16v-3.2c0-1.4 1-2.3 2.2-2.3S16 11.4 16 12.8V16"/><line x1="12" y1="11" x2="12" y2="16"/></svg>
+        <span class="tip">LinkedIn</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>Sakthivel G — Senior Unity Developer · Built with intent, not templates</footer>
+
+<script>
+  // work section page switcher
+  (function initWorkPages(){
+    const dots = document.querySelectorAll('.work-dots .carousel-dot');
+    const pages = { 1: document.getElementById('workPage1'), 2: document.getElementById('workPage2') };
+    if(!dots.length) return;
+
+    function goToPage(p){
+      dots.forEach(d => d.classList.toggle('active', d.getAttribute('data-page') === p));
+      Object.keys(pages).forEach(k => pages[k].classList.toggle('active', k === p));
+    }
+
+    let current = '1';
+    let autoTimer = null;
+    function startAuto(){
+      clearInterval(autoTimer);
+      autoTimer = setInterval(() => {
+        current = current === '1' ? '2' : '1';
+        goToPage(current);
+      }, 10000);
+    }
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        current = dot.getAttribute('data-page');
+        goToPage(current);
+        startAuto();
+      });
+    });
+
+    startAuto();
+  })();
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); } });
+  }, {threshold: 0.15});
+  revealEls.forEach(el => io.observe(el));
+
+  // custom cursor: glass orb + holographic ring + short glowing trail + magnetic hover
+  (function initCustomCursor(){
+    const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const orb = document.getElementById('cursor-orb');
+    const ring = document.getElementById('cursor-ring');
+    const pwrap = document.getElementById('cursor-particles');
+    if(!isFinePointer || !orb || !ring || !pwrap) return;
+
+    let tx = window.innerWidth/2, ty = window.innerHeight/2;
+    let ox = tx, oy = ty, prevOx = tx, prevOy = ty;
+    let particles = [];
+    const maxParticles = 12;
+    let started = false;
+
+    window.addEventListener('mousemove', (e) => {
+      tx = e.clientX; ty = e.clientY;
+      if(!started){ started = true; orb.classList.add('on'); ring.classList.add('on'); ox = tx; oy = ty; }
+    });
+
+    document.querySelectorAll('a, button, .project-card, .contact-icon, .carousel-dot').forEach((el) => {
+      el.addEventListener('mousemove', (e) => {
+        const r = el.getBoundingClientRect();
+        const mx = e.clientX - r.left - r.width/2;
+        const my = e.clientY - r.top - r.height/2;
+        el.style.transform = `translate(${mx*0.12}px, ${my*0.12 - 2}px)`;
+      });
+      el.addEventListener('mouseenter', () => {
+        ring.style.width = '46px'; ring.style.height = '46px';
+        ring.style.borderColor = 'rgba(111,157,199,0.85)';
+        orb.style.boxShadow = '0 0 22px rgba(111,157,199,0.75)';
+        el.style.transition = 'transform 0.2s ease';
+      });
+      el.addEventListener('mouseleave', () => {
+        ring.style.width = '32px'; ring.style.height = '32px';
+        ring.style.borderColor = 'rgba(207,212,220,0.5)';
+        orb.style.boxShadow = '0 0 14px rgba(111,157,199,0.5)';
+        el.style.transform = 'translate(0,0)';
+      });
+    });
+
+    function easeOutCubic(t){ return 1 - Math.pow(1-t, 3); }
+
+    function tick(){
+      prevOx = ox; prevOy = oy;
+      ox += (tx-ox)*0.2;
+      oy += (ty-oy)*0.2;
+      orb.style.left = ox+'px'; orb.style.top = oy+'px';
+      ring.style.left = ox+'px'; ring.style.top = oy+'px';
+
+      const speed = Math.hypot(ox-prevOx, oy-prevOy);
+      if(speed > 0.3 && particles.length < maxParticles){
+        const size = 2 + Math.random()*3.5;
+        const sideDrift = (Math.random()-0.5)*0.25;
+        const px = ox + (Math.random()-0.5)*4;
+        const py = oy + (Math.random()-0.5)*4;
+        const op = 0.4 + Math.random()*0.35;
+        const el = document.createElement('div');
+        el.className = 'cursor-particle';
+        el.style.cssText = `width:${size}px;height:${size}px;left:${px}px;top:${py}px;`+
+          `background:radial-gradient(circle, rgba(207,212,220,0.9) 0%, rgba(111,157,199,0.6) 45%, rgba(111,157,199,0) 75%);`+
+          `box-shadow:0 0 ${size*1.6}px rgba(111,157,199,0.4);`;
+        pwrap.appendChild(el);
+        particles.push({ el, life:1, decay:1/(26+Math.random()*14), baseOp:op, dx:sideDrift, dy:-(0.25+Math.random()*0.2), x:px, y:py });
+      }
+      particles.forEach((p) => {
+        p.life -= p.decay;
+        const t = Math.max(p.life,0);
+        const eased = easeOutCubic(t);
+        p.x += p.dx; p.y += p.dy;
+        p.dy -= 0.003;
+        p.el.style.left = p.x+'px'; p.el.style.top = p.y+'px';
+        p.el.style.opacity = eased * p.baseOp * 2;
+        p.el.style.transform = `translate(-50%,-50%) scale(${0.4+eased*0.6})`;
+      });
+      particles = particles.filter((p) => {
+        if(p.life <= 0){ p.el.remove(); return false; }
+        return true;
+      });
+
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
+
+  // ===== 3D animated background (Tron-style simulation grid + telemetry particles) =====
+  (function initBG3D(){
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const container = document.getElementById('bg3d');
+    const fallback = document.getElementById('gridFallback');
+    if(reduceMotion || !window.WebGLRenderingContext){ return; } // keep flat CSS grid fallback
+
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/three@0.160.0/build/three.min.js';
+    script.onload = () => { try { startScene(); startOrb(); } catch(e){ console.warn('3D bg failed', e); } };
+    script.onerror = () => { /* keep CSS grid fallback */ };
+    document.head.appendChild(script);
+
+    function startScene(){
+      const THREE = window.THREE;
+      if(!THREE) return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 200);
+      camera.position.set(0, 4.2, 9);
+      camera.rotation.x = -0.32;
+
+      const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+
+      // --- horizon grid (amber wireframe plane, undulating like a live sim floor) ---
+      const gridSize = 26, segs = 26;
+      const geo = new THREE.PlaneGeometry(gridSize, gridSize, segs, segs);
+      geo.rotateX(-Math.PI / 2);
+      const basePos = geo.attributes.position.array.slice();
+      const wire = new THREE.WireframeGeometry(geo);
+      const gridMat = new THREE.LineBasicMaterial({ color: 0xc7ccd4, transparent:true, opacity:0.095 });
+      const gridMesh = new THREE.LineSegments(wire, gridMat);
+      gridMesh.position.y = -1.6;
+      gridMesh.position.z = -2;
+      scene.add(gridMesh);
+
+      // second faint cyan grid, larger + further, opposite drift for depth
+      const geo2 = new THREE.PlaneGeometry(gridSize*1.6, gridSize*1.6, 20, 20);
+      geo2.rotateX(-Math.PI/2);
+      const wire2 = new THREE.WireframeGeometry(geo2);
+      const gridMat2 = new THREE.LineBasicMaterial({ color: 0x6f9dc7, transparent:true, opacity:0.03 });
+      const gridMesh2 = new THREE.LineSegments(wire2, gridMat2);
+      gridMesh2.position.y = -3.4;
+      gridMesh2.position.z = -6;
+      scene.add(gridMesh2);
+
+      // --- floating telemetry particles ---
+      const particleCount = 140;
+      const particlePos = new Float32Array(particleCount * 3);
+      const particleSpeed = new Float32Array(particleCount);
+      for(let i=0;i<particleCount;i++){
+        particlePos[i*3]   = (Math.random()-0.5) * 22;
+        particlePos[i*3+1] = Math.random() * 8 - 1;
+        particlePos[i*3+2] = (Math.random()-0.5) * 20 - 3;
+        particleSpeed[i] = 0.002 + Math.random()*0.004;
+      }
+      const pGeo = new THREE.BufferGeometry();
+      pGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
+      const pMat = new THREE.PointsMaterial({ color:0xc7ccd4, size:0.045, transparent:true, opacity:0.55 });
+      const points = new THREE.Points(pGeo, pMat);
+      scene.add(points);
+
+      // subtle mouse parallax
+      let mouseX = 0, mouseY = 0;
+      window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth - 0.5);
+        mouseY = (e.clientY / window.innerHeight - 0.5);
+      });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      let clock = new THREE.Clock();
+      function tick(){
+        const t = clock.getElapsedTime();
+
+        // undulate grid vertices (simulation "breathing")
+        const pos = geo.attributes.position;
+        for(let i=0;i<pos.count;i++){
+          const x = basePos[i*3], z = basePos[i*3+2];
+          const y = Math.sin(x*0.35 + t*0.6) * 0.22 + Math.cos(z*0.3 + t*0.4) * 0.22;
+          pos.setY(i, y);
+        }
+        pos.needsUpdate = true;
+        gridMesh.geometry.dispose();
+        gridMesh.geometry = new THREE.WireframeGeometry(geo);
+
+        // drift particles upward, loop back down
+        const pp = pGeo.attributes.position;
+        for(let i=0;i<particleCount;i++){
+          let y = pp.getY(i) + particleSpeed[i];
+          if(y > 7) y = -1;
+          pp.setY(i, y);
+        }
+        pp.needsUpdate = true;
+
+        // camera parallax, more reactive drift
+        camera.position.x += (mouseX*2.6 - camera.position.x) * 0.035;
+        camera.position.y += (4.2 - mouseY*1.6 - camera.position.y) * 0.035;
+        camera.rotation.z += ((mouseX*0.06) - camera.rotation.z) * 0.03;
+        camera.lookAt(mouseX*1.5, 0.4, -4);
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(tick);
+      }
+      tick();
+
+      container.classList.add('loaded');
+      if(fallback) fallback.style.opacity = '0';
+    }
+  })();
+
+  // gentle mast lift animation loop (respects reduced motion via CSS above)
+  function startOrb(){
+    const THREE = window.THREE;
+    const container = document.getElementById('orbCanvas');
+    if(!THREE || !container) return;
+
+    const w = container.clientWidth, h = container.clientHeight;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, w/h, 0.1, 50);
+    camera.position.set(0, 0.9, 4.4);
+    camera.lookAt(0, -0.1, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(w, h);
+    container.appendChild(renderer.domElement);
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    const cageGeo = new THREE.IcosahedronGeometry(1.25, 1);
+    const cageMat = new THREE.LineBasicMaterial({ color:0xcfd4dc, transparent:true, opacity:0.4 });
+    group.add(new THREE.LineSegments(new THREE.WireframeGeometry(cageGeo), cageMat));
+
+    const ringColors = [0xcfd4dc, 0x6f9dc7, 0xcfd4dc];
+    const rings = [];
+    [{x:0,y:0},{x:Math.PI/2,y:0},{x:Math.PI/2.4,y:Math.PI/2.6}].forEach((tilt, i) => {
+      const rGeo = new THREE.TorusGeometry(0.88, 0.007, 4, 72);
+      const rMat = new THREE.LineBasicMaterial({ color: ringColors[i], transparent:true, opacity:0.65 });
+      const ring = new THREE.LineSegments(new THREE.WireframeGeometry(rGeo), rMat);
+      ring.rotation.set(tilt.x, tilt.y, 0);
+      group.add(ring);
+      rings.push(ring);
+    });
+
+    const nodesMat = new THREE.PointsMaterial({ color:0xffffff, size:0.03, transparent:true, opacity:0.85 });
+    group.add(new THREE.Points(cageGeo, nodesMat));
+
+    const floorGeo = new THREE.PlaneGeometry(7, 7, 12, 12);
+    floorGeo.rotateX(-Math.PI/2);
+    const floorMat = new THREE.LineBasicMaterial({ color:0xcfd4dc, transparent:true, opacity:0.12 });
+    const floor = new THREE.LineSegments(new THREE.WireframeGeometry(floorGeo), floorMat);
+    floor.position.y = -1.5;
+    floor.position.z = -0.5;
+    scene.add(floor);
+
+    const starCount = 26;
+    const starPos = new Float32Array(starCount*3);
+    for(let i=0;i<starCount;i++){
+      starPos[i*3]   = (Math.random()-0.5) * 5.5;
+      starPos[i*3+1] = (Math.random()-0.1) * 2.6;
+      starPos[i*3+2] = (Math.random()-0.5) * 3 - 1;
+    }
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color:0xffffff, size:0.022, transparent:true, opacity:0.5 })));
+
+    window.addEventListener('resize', () => {
+      const nw = container.clientWidth, nh = container.clientHeight;
+      if(nw === 0 || nh === 0) return;
+      camera.aspect = nw/nh; camera.updateProjectionMatrix();
+      renderer.setSize(nw, nh);
+    });
+
+    function tick(){
+      group.rotation.y += 0.0022;
+      rings[0].rotation.z += 0.004;
+      rings[1].rotation.z += 0.003;
+      rings[2].rotation.z -= 0.0035;
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
+  </script>
+
+  <script type="module">
+    (async function loadHeroHeadset(){
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const container = document.getElementById('heroModel');
+      if(reduceMotion || !container || !window.WebGLRenderingContext) return;
+
+      try {
+        const THREE = await import('three');
+        const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+        const { DRACOLoader } = await import('three/addons/loaders/DRACOLoader.js');
+        const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
+
+        const w = container.clientWidth, h = container.clientHeight;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(35, w/h, 0.1, 50);
+        camera.position.set(0, 0.08, 4.85);
+
+        const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(w, h);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.15;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // studio-style environment for realistic reflections (premium product-shot feel)
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+        scene.add(new THREE.HemisphereLight(0xffffff, 0x11151c, 1.2));
+        const key = new THREE.DirectionalLight(0xffffff, 3.0);
+        key.position.set(2, 3, 4);
+        key.castShadow = true;
+        key.shadow.mapSize.set(1024, 1024);
+        key.shadow.camera.near = 1;
+        key.shadow.camera.far = 10;
+        key.shadow.radius = 6;
+        scene.add(key);
+        const rim = new THREE.DirectionalLight(0x6fb8e8, 2.2);
+        rim.position.set(-3, 1.4, -2.6);
+        scene.add(rim);
+        const backLight = new THREE.DirectionalLight(0x9b7fe0, 1.1);
+        backLight.position.set(1.2, 0.6, -3.5);
+        scene.add(backLight);
+        const fill = new THREE.DirectionalLight(0xcfd4dc, 0.9);
+        fill.position.set(-1, -1.5, 2.5);
+        scene.add(fill);
+
+        // soft contact shadow beneath the model
+        const shadowGeo = new THREE.PlaneGeometry(3, 3);
+        const shadowMat = new THREE.ShadowMaterial({ opacity:0.18 });
+        const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
+        shadowPlane.rotation.x = -Math.PI/2;
+        shadowPlane.position.y = -0.85;
+        shadowPlane.receiveShadow = true;
+        scene.add(shadowPlane);
+
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+        const loader = new GLTFLoader();
+        loader.setDRACOLoader(dracoLoader);
+
+        const group = new THREE.Group();
+        scene.add(group);
+
+        let mixer = null;
+        let introDone = false;
+
+        loader.load('./laptop.glb', (gltf) => {
+          const model = gltf.scene;
+
+          const box = new THREE.Box3().setFromObject(model);
+          const size = new THREE.Vector3();
+          box.getSize(size);
+          const center = new THREE.Vector3();
+          box.getCenter(center);
+          const scale = 2.30 / Math.max(size.x, size.y, size.z);
+          model.scale.setScalar(scale);
+          model.position.set(-center.x*scale, -center.y*scale, -center.z*scale);
+          model.traverse((child) => {
+            if(child.isMesh){ child.castShadow = true; child.receiveShadow = false; }
+          });
+
+          group.add(model);
+
+          if(gltf.animations && gltf.animations.length){
+            mixer = new THREE.AnimationMixer(model);
+            const action = mixer.clipAction(gltf.animations[0]);
+            action.setLoop(THREE.LoopOnce);
+            action.clampWhenFinished = true;
+            mixer.addEventListener('finished', () => {
+              introDone = true;
+              velX = 0.001;
+            });
+            action.play();
+          } else {
+            introDone = true;
+            velX = 0.001;
+          }
+        }, undefined, (err) => { console.warn('model load failed', err); });
+
+        window.addEventListener('resize', () => {
+          const nw = container.clientWidth, nh = container.clientHeight;
+          if(nw === 0 || nh === 0) return;
+          camera.aspect = nw/nh; camera.updateProjectionMatrix();
+          renderer.setSize(nw, nh);
+        });
+
+        // drag-to-rotate interaction
+        let dragging = false, lastX = 0, lastY = 0;
+        let velX = 0;
+        let targetTiltX = 0, tiltX = 0;
+        let idleTimer = null;
+
+        function pointerDown(e){
+          dragging = true;
+          container.classList.add('dragging');
+          lastX = (e.touches ? e.touches[0].clientX : e.clientX);
+          lastY = (e.touches ? e.touches[0].clientY : e.clientY);
+          velX = 0;
+          clearTimeout(idleTimer);
+        }
+        function pointerMove(e){
+          if(!dragging) return;
+          const x = (e.touches ? e.touches[0].clientX : e.clientX);
+          const y = (e.touches ? e.touches[0].clientY : e.clientY);
+          const dx = x - lastX, dy = y - lastY;
+          velX = dx * 0.0022;
+          targetTiltX = Math.max(-0.35, Math.min(0.35, targetTiltX + dy * 0.0022));
+          lastX = x; lastY = y;
+        }
+        function pointerUp(){
+          if(!dragging) return;
+          dragging = false;
+          container.classList.remove('dragging');
+          idleTimer = setTimeout(() => { velX = 0.001; }, 900);
+        }
+        container.addEventListener('pointerdown', pointerDown);
+        window.addEventListener('pointermove', pointerMove);
+        window.addEventListener('pointerup', pointerUp);
+        container.addEventListener('touchstart', pointerDown, {passive:true});
+        window.addEventListener('touchmove', pointerMove, {passive:true});
+        window.addEventListener('touchend', pointerUp);
+
+        // gentle mouse parallax (page-wide, independent of drag)
+        let parallaxX = 0, parallaxY = 0, targetParallaxX = 0, targetParallaxY = 0;
+        window.addEventListener('mousemove', (e) => {
+          const nx = (e.clientX / window.innerWidth) * 2 - 1;
+          const ny = (e.clientY / window.innerHeight) * 2 - 1;
+          targetParallaxY = nx * 0.045;
+          targetParallaxX = ny * 0.022;
+        });
+
+        let t = 0;
+        const clock = new THREE.Clock();
+        function tick(){
+          const delta = clock.getDelta();
+          if(mixer) mixer.update(delta);
+          t += 0.004;
+          group.rotation.y += velX;
+          tiltX += (targetTiltX - tiltX) * 0.08;
+          parallaxX += (targetParallaxX - parallaxX) * 0.04;
+          parallaxY += (targetParallaxY - parallaxY) * 0.04;
+          group.rotation.x = tiltX + parallaxX;
+          camera.position.x += (parallaxY - camera.position.x) * 0.04;
+          camera.lookAt(0, 0, 0);
+          if(!dragging){ group.position.y = Math.sin(t) * 0.035; }
+          renderer.render(scene, camera);
+          requestAnimationFrame(tick);
+        }
+        tick();
+      } catch(e){ console.warn('3D headset failed to load', e); }
+    })();
+  </script>
+
+  <script>
+  const secondary = document.querySelector('.lift-secondary');
+  if(secondary && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    let t = 0;
+    function animateMast(){
+      t += 0.008;
+      const lift = Math.sin(t) * 14;
+      secondary.style.transform = `translateY(${-Math.max(lift,0)}px)`;
+      requestAnimationFrame(animateMast);
+    }
+    animateMast();
+  }
+</script>
+
+</body>
+</html>
