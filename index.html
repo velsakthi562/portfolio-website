@@ -1020,8 +1020,8 @@
             const action = mixer.clipAction(gltf.animations[0]);
             action.setLoop(THREE.LoopOnce);
             action.clampWhenFinished = true;
-            action.time = 0;
-            action.timeScale = 1;
+            action.time = action.getClip().duration;
+            action.timeScale = -1;
             mixer.addEventListener('finished', () => {
               introDone = true;
               velX = 0.001;
