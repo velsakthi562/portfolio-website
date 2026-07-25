@@ -382,6 +382,10 @@
     <div class="hero-actions">
       <a href="#work" class="btn btn-primary">View Work</a>
       <a href="#contact" class="btn btn-ghost">Contact</a>
+      <a href="./assets/resume.pdf" download class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px; vertical-align:-2px;"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        Resume
+      </a>
     </div>
   </div>
 
@@ -996,7 +1000,7 @@
         let mixer = null;
         let introDone = false;
 
-        loader.load('./laptop.glb', (gltf) => {
+        loader.load('./assets/laptop.glb', (gltf) => {
           const model = gltf.scene;
 
           const box = new THREE.Box3().setFromObject(model);
