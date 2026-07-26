@@ -945,7 +945,7 @@
         const w = container.clientWidth, h = container.clientHeight;
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(35, w/h, 0.1, 50);
-        camera.position.set(0, 0.08, 4.85);
+        camera.position.set(0, 0.08, 5.6);
 
         const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -1008,7 +1008,7 @@
           box.getSize(size);
           const center = new THREE.Vector3();
           box.getCenter(center);
-          const scale = 2.30 / Math.max(size.x, size.y, size.z);
+          const scale = 1.85 / Math.max(size.x, size.y, size.z);
           model.scale.setScalar(scale);
           model.position.set(-center.x*scale, -center.y*scale, -center.z*scale);
           model.rotation.y = Math.PI;
