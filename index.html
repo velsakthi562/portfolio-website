@@ -188,6 +188,7 @@
   .project-grid.work-page{ display:none; }
   .project-grid.work-page.active{ display:grid; }
   .work-dots{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:36px; }
+  .more-works-link{ display:flex; justify-content:center; margin-top:40px; }
   .carousel-dot{ width:26px; height:3px; border-radius:2px; background:var(--line); border:none; cursor:pointer; transition:all 0.3s ease; padding:0; }
   .carousel-dot.active{ width:40px; background:var(--amber); }
 
@@ -366,6 +367,7 @@
     <div class="nav-links">
       <a href="#about">About</a>
       <a href="#work">Work</a>
+      <a href="works.html">More Works</a>
       <a href="#stack">Skills</a>
       <a href="#contact">Contact</a>
     </div>
@@ -553,6 +555,10 @@
     <div class="carousel-dots work-dots">
       <button class="carousel-dot active" data-page="1" aria-label="Page 1"></button>
       <button class="carousel-dot" data-page="2" aria-label="Page 2"></button>
+    </div>
+
+    <div class="more-works-link reveal">
+      <a href="works.html" class="btn btn-ghost">More works &middot; Live WebGL projects &rarr;</a>
     </div>
   </div>
 </section>
